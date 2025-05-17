@@ -1,0 +1,97 @@
+    /* Fondo general */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Estilo del contenedor de login */
+        .login-container {
+            background: linear-gradient(135deg, #604eea, #10c2f3); /* Degradado suave */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Animación de entrada */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Título del formulario */
+        .login-container h2 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        /* Estilo de los campos de entrada */
+        .form-control {
+            border-radius: 30px;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #4865f5ad;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Efecto al hacer focus en los campos */
+        .form-control:focus {
+            border-color: #284ea5;
+            box-shadow: 0 0 10px rgba(255, 154, 139, 0.6);
+        }
+
+        /* Estilo del botón */
+        .btn-primary {
+            background-color: #1e67d4;
+            border-color: #2a0aac;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0e52b8;
+            border-color: #215198;
+            transform: scale(1.05);
+        }
+
+        /* Mensaje de error */
+        .error-message {
+            color: #13457e;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+
+        /* Estilo del enlace de registro */
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: #2836d9;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .register-link a:hover {
+            color: #1267ad;
+        }
