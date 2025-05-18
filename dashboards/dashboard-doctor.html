@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Doctor - EPS Universal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #212529;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: #1e293b;
+            box-shadow: 4px 0 12px rgb(0 0 0 / 0.15);
+            display: flex;
+            flex-direction: column;
+            padding-top: 1.5rem;
+            z-index: 1100;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+        }
+
+        #sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        #sidebar .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #fbbf24;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+
+        #sidebar nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 1rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        #sidebar nav a:hover,
+        #sidebar nav a.active {
+            background: #334155;
+            color: #fbbf24;
+            border-left-color: #fbbf24;
+        }
+
+        /* Contenido principal */
+        #mainContent {
+            margin-left: 250px;
+            padding: 2rem 3rem;
+            min-height: 100vh;
+            background: #f5f7fa;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header */
+        header.navbar-top {
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        /* Botón hamburguesa */
+        .btn-sidebar-toggle {
+            background: transparent;
+            border: none;
+            font-size: 1.8rem;
+            color: #1e293b;
+            cursor: pointer;
+            display: none;
+            user-select: none;
+        }
+
+        .btn-sidebar-toggle:focus {
+            outline: 2px solid #fbbf24;
+            outline-offset: 2px;
+        }
+
+        /* Botón cerrar sesión */
+        header.navbar-top button.logout-btn {
+            background: #fbbf24;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        header.navbar-top button.logout-btn:hover {
+            background: #f59e0b;
+            color: white;
+        }
+
+        /* Formulario editar datos */
+        form#formDatos label {
+            font-weight: 600;
+        }
+
+        form#formDatos input,
+        form#formDatos select {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        form#formDatos button {
+            background: #fbbf24;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form#formDatos button:hover {
+            background: #f59e0b;
+            color: white;
+        }
+
+        /* Lista de citas programadas */
+        #listaCitas {
+            margin-top: 1rem;
+        }
+
+        #listaCitas table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #listaCitas th,
+        #listaCitas td {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        #listaCitas th {
+            background-color: #fbbf24;
+            color: #1e293b;
+        }
+
+        #listaCitas button {
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #mainContent {
+                margin-left: 0;
+                padding: 1.5rem 1.5rem;
+            }
+
+            .btn-sidebar-toggle {
+                display: inline-block;
+            }
+        }
+        #sidebar {
+    transform: translateX(0);
+}
+
+/* Solo ocultar en pantallas pequeñas */
+@media (max-width: 991.98px) {
+    #sidebar {
+        transform: translateX(-100%);
+    }
+    #sidebar.open {
+        transform: translateX(0);
+    }
+}
+
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+  <aside id="sidebar" aria-label="Navegación principal">
+
+        <div class="logo" tabindex="0">EPS Universal</div>
+        <nav>
+            <a href="#historial" class="active" data-target="historial" tabindex="0" aria-current="page">Historial</a>
+            <a href="#citas" data-target="citas" tabindex="0">Citas programadas</a>
+            <a href="#pacientes" data-target="pacientes" tabindex="0">Pacientes</a>
+            <a href="#misdatos" data-target="misdatos" tabindex="0">Mis Datos</a>
+        </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main id="mainContent" tabindex="-1">
+        <header class="navbar-top" role="banner">
+            <button aria-label="Abrir menú lateral" aria-expanded="false" aria-controls="sidebar"
+                class="btn-sidebar-toggle" id="btnToggleSidebar">&#9776;</button>
+            <h1 class="h5 m-0">Dashboard Doctor</h1>
+            <button class="logout-btn" aria-label="Cerrar sesión">Cerrar sesión</button>
+        </header>
+
+        <!-- Secciones -->
+        <section id="historial" tabindex="0" aria-label="Historial de citas">
+            <h2>Historial de citas</h2>
+            <div id="historialCitas">
+                <p>No tienes citas agendadas.</p>
+            </div>
+        </section>
+
+        <section id="citas" tabindex="0" aria-label="Citas programadas" hidden>
+            <h2>Citas programadas</h2>
+            <div id="listaCitas">
+                <!-- Aquí se cargarán las citas desde JS -->
+            </div>
+        </section>
+
+        <section id="pacientes" tabindex="0" aria-label="Historial clínico de pacientes" hidden>
+            <h2>Pacientes</h2>
+            <div id="listaPacientes"></div>
+            <hr>
+            <div id="historialClinico" hidden>
+                <h3>Historial Clínico de <span id="nombrePaciente"></span></h3>
+                <ul id="detallesHistorial"></ul>
+                <button id="btnCerrarHistorial" class="btn btn-secondary mt-3">Cerrar historial</button>
+            </div>
+        </section>
+
+        <section id="misdatos" tabindex="0" aria-label="Editar datos personales" hidden>
+            <h2>Mis Datos Personales</h2>
+            <form id="formDatos" novalidate>
+                <label for="nombreDoctor">Nombre Completo</label>
+                <input type="text" id="nombreDoctor" name="nombreDoctor" required />
+            <label for="emailDoctor">Correo electrónico</label>
+            <input type="email" id="emailDoctor" name="emailDoctor" required />
+
+            <label for="especialidad">Especialidad</label>
+            <input type="text" id="especialidad" name="especialidad" required />
+
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" />
+
+            <button type="submit">Guardar Cambios</button>
+        </form>
+        <div id="mensajeDatos" role="alert" aria-live="polite" style="margin-top: 1rem;"></div>
+    </section>
+</main>
+
+<script>
+    // Datos simulados que vendrían del backend
+    const citasDoctor = [
+        {
+            id: 1,
+            paciente: "Carlos Mendoza",
+            fecha: "2025-05-20",
+            hora: "10:00 AM",
+            motivo: "Consulta general",
+            estado: "Pendiente"
+        },
+        {
+            id: 2,
+            paciente: "Ana Torres",
+            fecha: "2025-05-20",
+            hora: "11:00 AM",
+            motivo: "Chequeo cardiológico",
+            estado: "Pendiente"
+        },
+        {
+            id: 3,
+            paciente: "Luis Gómez",
+            fecha: "2025-05-21",
+            hora: "09:30 AM",
+            motivo: "Revisión laboratorio",
+            estado: "Confirmada"
+        }
+    ];
+
+    // Manejo del menú lateral y secciones
+    const sidebar = document.getElementById('sidebar');
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const mainContent = document.getElementById('mainContent');
+    const linksNav = sidebar.querySelectorAll('nav a');
+    const secciones = ['historial', 'citas', 'pacientes', 'misdatos'];
+
+    btnToggleSidebar.addEventListener('click', () => {
+        const expanded = btnToggleSidebar.getAttribute('aria-expanded') === 'true';
+        btnToggleSidebar.setAttribute('aria-expanded', !expanded);
+        sidebar.classList.toggle('open');
+    });
+
+    linksNav.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = link.getAttribute('data-target');
+
+            // Marcar activo en menú
+            linksNav.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            // Mostrar solo la sección correspondiente
+            secciones.forEach(sec => {
+                const secElem = document.getElementById(sec);
+                if (sec === target) {
+                    secElem.hidden = false;
+                    secElem.focus();
+                } else {
+                    secElem.hidden = true;
+                }
+            });
+
+            // Cerrar sidebar en móviles
+            if (window.innerWidth < 992) {
+                sidebar.classList.remove('open');
+                btnToggleSidebar.setAttribute('aria-expanded', false);
+            }
+
+            // Si la sección es citas, cargar lista
+            if (target === 'citas') {
+                cargarCitas();
+            }
+            // Si la sección es pacientes, cargar lista (opcional)
+            if (target === 'pacientes') {
+                cargarPacientes();
+            }
+        });
+    });
+
+    // Función para cargar las citas del doctor
+    function cargarCitas() {
+        const divLista = document.getElementById('listaCitas');
+        if (citasDoctor.length === 0) {
+            divLista.innerHTML = '<p>No hay citas programadas.</p>';
+            return;
+        }
+
+        let html = `<table aria-describedby="listaCitas">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        citasDoctor.forEach(cita => {
+            html += `
+            <tr>
+                <td>${cita.paciente}</td>
+                <td>${cita.fecha}</td>
+                <td>${cita.hora}</td>
+                <td>${cita.motivo}</td>
+                <td id="estado-${cita.id}">${cita.estado}</td>
+                <td>
+                    <button aria-label="Confirmar cita de ${cita.paciente}" onclick="confirmarCita(${cita.id})" class="btn btn-sm btn-success" ${cita.estado === 'Confirmada' ? 'disabled' : ''}>Confirmar</button>
+                    <button aria-label="Cancelar cita de ${cita.paciente}" onclick="cancelarCita(${cita.id})" class="btn btn-sm btn-danger" ${cita.estado === 'Cancelada' ? 'disabled' : ''}>Cancelar</button>
+                </td>
+            </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        divLista.innerHTML = html;
+    }
+
+    // Confirmar cita
+    function confirmarCita(id) {
+        const cita = citasDoctor.find(c => c.id === id);
+        if (!cita) return;
+        cita.estado = "Confirmada";
+        document.getElementById(`estado-${id}`).textContent = "Confirmada";
+        cargarCitas();
+    }
+
+    // Cancelar cita
+    function cancelarCita(id) {
+        const cita = citasDoctor.find(c => c.id === id);
+        if (!cita) return;
+        cita.estado = "Cancelada";
+        document.getElementById(`estado-${id}`).textContent = "Cancelada";
+        cargarCitas();
+    }
+
+    // Carga de pacientes (simulado)
+    const pacientes = [
+        {
+            id: 1,
+            nombre: "Carlos Mendoza",
+            historial: [
+                "Consulta general 2024-12-01: Control de peso",
+                "Vacunación antigripal 2024-11-15"
+            ]
+        },
+        {
+            id: 2,
+            nombre: "Ana Torres",
+            historial: [
+                "Chequeo cardiológico 2024-10-10",
+                "Ecografía abdominal 2024-09-05"
+            ]
+        }
+    ];
+
+    function cargarPacientes() {
+        const divPacientes = document.getElementById('listaPacientes');
+        if (pacientes.length === 0) {
+            divPacientes.innerHTML = "<p>No hay pacientes registrados.</p>";
+            return;
+        }
+        let html = '<ul class="list-group">';
+        pacientes.forEach(p => {
+            html += `<li class="list-group-item list-group-item-action" tabindex="0" role="button" aria-pressed="false" onclick="mostrarHistorial(${p.id})" onkeydown="if(event.key==='Enter'){mostrarHistorial(${p.id})}">
+            ${p.nombre}</li>`;
+        });
+        html += '</ul>';
+        divPacientes.innerHTML = html;
+        document.getElementById('historialClinico').hidden = true;
+    }
+
+    // Mostrar historial clínico de paciente
+    function mostrarHistorial(idPaciente) {
+        const paciente = pacientes.find(p => p.id === idPaciente);
+        if (!paciente) return;
+
+        const divHistorial = document.getElementById('historialClinico');
+        const ulDetalles = document.getElementById('detallesHistorial');
+        const nombreSpan = document.getElementById('nombrePaciente');
+
+        nombreSpan.textContent = paciente.nombre;
+        ulDetalles.innerHTML = '';
+        paciente.historial.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            ulDetalles.appendChild(li);
+        });
+
+        divHistorial.hidden = false;
+        divHistorial.focus();
+    }
+
+    document.getElementById('btnCerrarHistorial').addEventListener('click', () => {
+        document.getElementById('historialClinico').hidden = true;
+        document.getElementById('listaPacientes').focus();
+    });
+
+    // Manejo del formulario Mis Datos
+    const formDatos = document.getElementById('formDatos');
+    const mensajeDatos = document.getElementById('mensajeDatos');
+
+    // Simulación de carga de datos del doctor
+    function cargarDatosDoctor() {
+        // Estos datos podrían venir del backend
+        const datos = {
+            nombreDoctor: "Dr. Juan Pérez",
+            emailDoctor: "juan.perez@epsuniversal.com",
+            especialidad: "Medicina General",
+            telefono: "3124567890"
+        };
+
+        formDatos.nombreDoctor.value = datos.nombreDoctor;
+        formDatos.emailDoctor.value = datos.emailDoctor;
+        formDatos.especialidad.value = datos.especialidad;
+        formDatos.telefono.value = datos.telefono;
+    }
+
+    formDatos.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!formDatos.checkValidity()) {
+            mensajeDatos.textContent = "Por favor completa todos los campos requeridos correctamente.";
+            mensajeDatos.style.color = "red";
+            return;
+        }
+        // Aquí se enviaría al backend para guardar
+        mensajeDatos.textContent = "Datos guardados correctamente.";
+        mensajeDatos.style.color = "green";
+    });
+
+    // Al cargar la página, cargar datos y mostrar historial por defecto
+    window.addEventListener('load', () => {
+        cargarDatosDoctor();
+        // Por defecto mostramos la sección historial y cargamos
+        secciones.forEach(sec => {
+            document.getElementById(sec).hidden = sec !== 'historial';
+        });
+        linksNav.forEach(l => l.classList.remove('active'));
+        linksNav[0].classList.add('active');
+    });
+</script>
+</body> </html>
+               
