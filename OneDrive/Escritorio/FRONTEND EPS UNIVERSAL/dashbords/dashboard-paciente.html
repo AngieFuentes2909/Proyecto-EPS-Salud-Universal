@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Paciente - EPS Universal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #212529;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-image: url('https://th.bing.com/th/id/R.1d987ef41e9bfeac4f2225cc57e2b727?rik=yVge6CktNPzTag&pid=ImgRaw&r=0');
+            box-shadow: 4px 0 12px rgb(0 0 0 / 0.15);
+            display: flex;
+            flex-direction: column;
+            padding-top: 1.5rem;
+            z-index: 1100;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+        }
+
+        #sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        #sidebar .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #43a2c2ec;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+
+        #sidebar nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 1rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        #sidebar nav a:hover,
+        #sidebar nav a.active {
+            background: #334155;
+            color: #43a2c2ec;
+            border-left-color: #24e2fb;
+        }
+
+        /* Contenido principal */
+        #mainContent {
+            margin-left: 250px;
+            padding: 2rem 3rem;
+            min-height: 100vh;
+            background: #f5f7fa;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Header */
+        header.navbar-top {
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        /* Botón hamburguesa */
+        .btn-sidebar-toggle {
+            background: transparent;
+            border: none;
+            font-size: 1.8rem;
+            color: #1e293b;
+            cursor: pointer;
+            display: none;
+            user-select: none;
+        }
+
+        .btn-sidebar-toggle:focus {
+            outline: 2px solid #24dbfb;
+            outline-offset: 2px;
+        }
+
+        /* Botón cerrar sesión */
+        header.navbar-top button.logout-btn {
+            background: #24e2fb;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        header.navbar-top button.logout-btn:hover {
+            background: #24e2fb;
+            color: white;
+        }
+
+        /* Formulario editar datos */
+        form#formDatos label {
+            font-weight: 600;
+        }
+
+        form#formDatos input,
+        form#formDatos select {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        form#formDatos button {
+            background: #24e2fb;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form#formDatos button:hover {
+            background: #24e2fb;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #mainContent {
+                margin-left: 0;
+                padding: 1.5rem 1.5rem;
+            }
+
+            .btn-sidebar-toggle {
+                display: inline-block;
+            }
+        }
+
+        .sidebar-footer {
+
+            color: #f1f5f9;
+            /* texto claro para contraste */
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer p {
+            color: #f8fafc;
+        }
+
+        .sidebar-footer .btn-outline-light {
+            border-color: #24e2fb;
+            color: #317079;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-footer .btn-outline-light:hover {
+            background-color: #24e2fb;
+
+        }
+
+        .sidebar-footer .btn-warning {
+            background-color: #24e2fb;
+            border: none;
+            color: #1e293b;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar-footer .btn-warning:hover {
+            background-color: #24e2fb;
+            color: #1e293b;
+        }
+
+        .submenu-citas button {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .submenu-citas button:hover {
+            color: #24e2fb;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside id="sidebar" aria-label="Navegación principal">
+        <div class="logo" tabindex="0">EPS Universal</div>
+        <nav>
+
+            <div class="dropdown-citas">
+                <a href="#" tabindex="0" onclick="toggleSubmenu(event)">Citas</a>
+                <div class="submenu-citas" style="display: none; flex-direction: column; padding-left: 1rem;">
+                    <button class="btn btn-link text-start p-0 mb-2" onclick="mostrarSeccion('agendar')">Agendar
+                        Cita</button>
+                    <button class="btn btn-link text-start p-0" onclick="mostrarSeccion('historial')">Historial de
+                        Citas</button>
+                </div>
+            </div>
+
+            <a href="#misdatos" data-target="misdatos" tabindex="0">Mis Datos</a>
+        </nav>
+        <div class="sidebar-footer mt-auto text-center p-3 border-top text-white">
+            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Foto de perfil" class="rounded-circle mb-2"
+                width="60" height="60" />
+            <p id="nombrePaciente" class="mb-1 fw-bold"></p>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-light btn-sm" onclick="verPerfil()">Ver perfil</button>
+                <button class="btn btn-warning btn-sm text-dark fw-bold" onclick="cerrarSesion()">Cerrar sesión</button>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- Contenido principal -->
+    <main id="mainContent" tabindex="-1">
+        <header class="navbar-top" role="banner">
+            <button aria-label="Abrir menú lateral" aria-expanded="false" aria-controls="sidebar"
+                class="btn-sidebar-toggle" id="btnToggleSidebar">&#9776;</button>
+            <h1 class="h5 m-0">Dashboard Paciente</h1>
+            <button class="logout-btn" aria-label="Cerrar sesión">Cerrar sesión</button>
+        </header>
+
+        <section id="historial" tabindex="0" aria-label="Historial de citas">
+            <h2>Historial de Citas</h2>
+            <div id="historialCitas">
+                <!-- La tabla se llena con JS -->
+            </div>
+        </section>
+
+
+        <section id="agendar" tabindex="0" aria-label="Agendar nueva cita" hidden>
+            <h2 class="mb-4">Agendar Cita</h2>
+            <form id="formAgendar" class="mb-4 needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="paciente" class="form-label">Paciente</label>
+                    <input type="text" class="form-control" id="paciente" readonly />
+                </div>
+                <div class="mb-3">
+                    <label for="unidad" class="form-label">Unidad médica</label>
+                    <select class="form-select" id="unidad" required>
+                        <option value="">Seleccione unidad</option>
+                        <option value="norte">Unidad Norte</option>
+                        <option value="sur">Unidad Sur</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="especialidad" class="form-label">Especialidad</label>
+                    <select class="form-select" id="especialidad" required>
+                        <option value="">Seleccione especialidad</option>
+                        <option value="general">Medicina General</option>
+                        <option value="odontologia">Odontología</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="medico" class="form-label">Médico</label>
+                    <select class="form-select" id="medico" required>
+                        <option value="">Seleccione médico</option>
+                        <!-- Se llenará dinámicamente -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="fecha" class="form-label">Fecha deseada</label>
+                    <input type="date" class="form-control" id="fecha" required />
+                </div>
+                <div class="mb-3">
+                    <label for="hora" class="form-label">Hora deseada</label>
+                    <input type="time" class="form-control" id="hora" required />
+                </div>
+                <button type="button" class="btn btn-info fw-bold" id="btnBuscarDisponibilidad">Buscar
+                    Disponibilidad</button>
+            </form>
+
+            <!-- Resultados de disponibilidad -->
+            <div id="resultadosDisponibilidad" class="mt-4" style="display: none;">
+                <h4>Disponibilidad encontrada</h4>
+                <table class="table table-hover table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Especialidad</th>
+                            <th>Médico</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaResultados">
+                        <!-- Se llenará con JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+
+        <section id="misdatos" tabindex="0" aria-label="Editar datos personales" hidden>
+            <h2>Mis Datos Personales</h2>
+            <form id="formDatos" novalidate>
+                <label for="nombre">Nombre completo</label>
+                <input type="text" id="nombre" required minlength="3" />
+
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" required />
+
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" pattern="[0-9]{7,15}" placeholder="Solo números, 7-15 dígitos" />
+
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" />
+
+                <label for="sexo">Sexo</label>
+                <select id="sexo" required>
+                    <option value="">Seleccione</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="O">Otro</option>
+                </select>
+
+                <button type="submit">Guardar cambios</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        // 1. Variables y datos globales
+        const sidebar = document.getElementById('sidebar');
+        const btnToggle = document.getElementById('btnToggleSidebar');
+        const links = sidebar.querySelectorAll('nav a');
+        const sections = document.querySelectorAll('main section');
+        const formDatos = document.getElementById('formDatos');
+        const formAgendar = document.getElementById('formAgendar');
+        const nombreEl = document.getElementById('nombrePaciente');
+
+        const datosUsuario = {
+            nombre: 'Juan Pérez',
+            email: 'juan.perez@example.com',
+            telefono: '3123456789',
+            direccion: 'Calle Falsa 123',
+            sexo: 'M',
+        };
+
+        let citas = [];
+
+        // 2. Funciones utilitarias
+        function cargarDatos() {
+            document.getElementById('nombre').value = datosUsuario.nombre;
+            document.getElementById('email').value = datosUsuario.email;
+            document.getElementById('telefono').value = datosUsuario.telefono;
+            document.getElementById('direccion').value = datosUsuario.direccion;
+            document.getElementById('sexo').value = datosUsuario.sexo;
+        }
+
+        function mostrarHistorial() {
+            const historialDiv = document.getElementById('historialCitas');
+            historialDiv.innerHTML = '';
+
+            if (citas.length === 0) {
+                historialDiv.innerHTML = '<p>No tienes citas agendadas.</p>';
+                return;
+            }
+
+            let tabla = `
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Especialidad</th>
+                    <th>Unidad</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+            citas.forEach((cita, index) => {
+                tabla += `
+            <tr>
+                <td>${datosUsuario.nombre}</td>
+                <td>${capitalizar(cita.especialidad)}</td>
+                <td>${capitalizar(cita.unidad || 'N/A')}</td>
+                <td>${cita.fecha}</td>
+                <td>${cita.hora}</td>
+                <td>${cita.estado || 'Pendiente'}</td>
+                <td><button class="btn btn-outline-primary btn-sm" onclick="descargarPDF(${index})">Descargar PDF</button></td>
+            </tr>
+        `;
+            });
+
+            tabla += '</tbody></table>';
+            historialDiv.innerHTML = tabla;
+        }
+
+
+        function capitalizar(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // 3. Eventos y navegación
+        btnToggle.addEventListener('click', () => {
+            const isOpen = sidebar.classList.toggle('open');
+            sidebar.classList.toggle('closed', !isOpen);
+            btnToggle.setAttribute('aria-expanded', isOpen.toString());
+        });
+
+        links.forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const target = link.getAttribute('data-target');
+
+                sections.forEach(sec => sec.hidden = sec.id !== target);
+                links.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                if (target === 'misdatos') cargarDatos();
+                if (target === 'historial') mostrarHistorial();
+
+                if (window.innerWidth < 992) {
+                    sidebar.classList.remove('open');
+                    sidebar.classList.add('closed');
+                    btnToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                sidebar.classList.remove('closed', 'open');
+            } else {
+                sidebar.classList.add('closed');
+            }
+        });
+
+        // 4. Formulario: Guardar datos personales
+        formDatos.addEventListener('submit', e => {
+            e.preventDefault();
+
+            if (!formDatos.checkValidity()) {
+                alert('Por favor complete correctamente el formulario.');
+                return;
+            }
+
+            const telefonoInput = document.getElementById('telefono');
+            if (telefonoInput.value.trim() !== '' && !telefonoInput.checkValidity()) {
+                alert('El teléfono debe contener solo números entre 7 y 15 dígitos.');
+                return;
+            }
+
+            datosUsuario.nombre = document.getElementById('nombre').value.trim();
+            datosUsuario.email = document.getElementById('email').value.trim();
+            datosUsuario.telefono = telefonoInput.value.trim();
+            datosUsuario.direccion = document.getElementById('direccion').value.trim();
+            datosUsuario.sexo = document.getElementById('sexo').value;
+
+            alert('Datos guardados con éxito. (Aquí conectas con backend para persistir)');
+        });
+
+        // 5. Formulario: Agendar cita
+        formAgendar.addEventListener('submit', e => {
+            e.preventDefault();
+
+            if (!formAgendar.checkValidity()) {
+                alert('Por favor complete correctamente el formulario para agendar cita.');
+                return;
+            }
+
+            const especialidad = document.getElementById('especialidad').value;
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            const fechaCita = new Date(`${fecha}T${hora}`);
+            const ahora = new Date();
+
+            if (fechaCita < ahora) {
+                alert('La fecha y hora no pueden ser anteriores a la actual.');
+                return;
+            }
+
+            citas.push({ especialidad, fecha, hora });
+            alert('Cita agendada correctamente.');
+            formAgendar.reset();
+
+            links.forEach(l => l.classList.remove('active'));
+            links.forEach(l => {
+                if (l.getAttribute('data-target') === 'historial') l.classList.add('active');
+            });
+            sections.forEach(sec => sec.hidden = sec.id !== 'historial');
+            mostrarHistorial();
+        });
+
+        // 6. Inicialización al cargar página
+        document.addEventListener('DOMContentLoaded', () => {
+            sections.forEach(sec => sec.hidden = sec.id !== 'historial');
+            mostrarHistorial();
+
+            if (window.innerWidth < 992) {
+                sidebar.classList.add('closed');
+            }
+
+            if (typeof nombreDesdeBackend !== 'undefined') {
+                nombreEl.textContent = nombreDesdeBackend;
+                datosUsuario.nombre = nombreDesdeBackend;
+            } else {
+                nombreEl.textContent = 'Usuario desconocido';
+            }
+
+            // Cargar datos si "Mis Datos" está visible desde el inicio
+            const misDatos = document.getElementById('misdatos');
+            if (misDatos && !misDatos.hidden) {
+                cargarDatos();
+            }
+        });
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.nextElementSibling;
+            submenu.style.display = submenu.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function mostrarSeccion(seccionId) {
+            // Oculta todas las secciones
+            document.querySelectorAll('main > section').forEach(section => {
+                section.hidden = true;
+            });
+
+            // Muestra la sección deseada
+            document.getElementById(seccionId).hidden = false;
+        }
+
+        // Para el botón del sidebar superior también
+        document.querySelectorAll('#sidebar nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                const target = e.target.dataset.target;
+                if (target) {
+                    mostrarSeccion(target);
+                }
+            });
+        });
+        document.getElementById('paciente').value = datosUsuario.nombre;
+
+
+        // Datos simulados
+        const medicosPorEspecialidad = {
+            general: ["Dra. Martínez", "Dr. Gómez"],
+            odontologia: ["Dra. López", "Dr. Ramírez"]
+        };
+
+        // Evento para cambiar médicos según especialidad
+        document.getElementById('especialidad').addEventListener('change', function () {
+            const seleccion = this.value;
+            const selectMedico = document.getElementById('medico');
+            selectMedico.innerHTML = '<option value="">Seleccione médico</option>';
+
+            if (medicosPorEspecialidad[seleccion]) {
+                medicosPorEspecialidad[seleccion].forEach(medico => {
+                    const option = document.createElement('option');
+                    option.value = medico;
+                    option.textContent = medico;
+                    selectMedico.appendChild(option);
+                });
+            }
+        });
+
+        // Buscar disponibilidad (simulado)
+        document.getElementById('btnBuscarDisponibilidad').addEventListener('click', () => {
+            const especialidad = document.getElementById('especialidad').value;
+            const medico = document.getElementById('medico').value;
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+
+            if (!especialidad || !medico || !fecha || !hora) {
+                alert("Complete todos los campos antes de buscar.");
+                return;
+            }
+
+            const tabla = document.getElementById('tablaResultados');
+            tabla.innerHTML = '';
+
+            // Simula resultados
+            for (let i = 0; i < 3; i++) {
+                const row = document.createElement('tr');
+                const horaDisponible = `${parseInt(hora.split(":")[0]) + i}:00`;
+
+                row.innerHTML = `
+            <td>${especialidad}</td>
+            <td>${medico}</td>
+            <td>${fecha}</td>
+            <td>${horaDisponible}</td>
+            <td><button class="btn btn-success btn-sm" onclick="confirmarCita('${especialidad}', '${medico}', '${fecha}', '${horaDisponible}')">Asignar</button></td>
+        `;
+
+                tabla.appendChild(row);
+            }
+
+            document.getElementById('resultadosDisponibilidad').style.display = 'block';
+        });
+
+        // Confirmación de cita
+        function confirmarCita(especialidad, medico, fecha, hora) {
+            const unidad = document.getElementById('unidad').value;
+
+            if (confirm(`¿Deseas confirmar esta cita con ${medico} el ${fecha} a las ${hora}?`)) {
+                citas.push({ especialidad, medico, fecha, hora, unidad, estado: 'Pendiente' });
+                alert("¡Cita asignada exitosamente!");
+                mostrarSeccion('historial');
+                mostrarHistorial();
+            }
+        }
+
+        async function descargarPDF(index) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const cita = citas[index];
+
+    doc.setFontSize(14);
+    doc.text("Confirmación de Cita Médica", 20, 20);
+    doc.setFontSize(12);
+
+    doc.text(`Paciente: ${datosUsuario.nombre}`, 20, 40);
+    doc.text(`Especialidad: ${capitalizar(cita.especialidad)}`, 20, 50);
+    doc.text(`Unidad médica: ${capitalizar(cita.unidad || 'N/A')}`, 20, 60);
+    doc.text(`Fecha: ${cita.fecha}`, 20, 70);
+    doc.text(`Hora: ${cita.hora}`, 20, 80);
+    doc.text(`Estado: ${cita.estado || 'Pendiente'}`, 20, 90);
+
+    doc.save(`Cita_${datosUsuario.nombre.replace(/\s/g, '_')}_${cita.fecha}.pdf`);
+}
+
+
+
+    </script>
+
+    <script src="js/paciente.js"></script>
+
+</body>
+
+</html>

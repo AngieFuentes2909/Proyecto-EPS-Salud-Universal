@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Administrador - EPS Universal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #212529;
+            overflow-x: hidden;
+        }
+
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: #1e293b;
+            box-shadow: 4px 0 12px rgb(0 0 0 / 0.15);
+            display: flex;
+            flex-direction: column;
+            padding-top: 1.5rem;
+            z-index: 1100;
+            transition: transform 0.3s ease;
+        }
+
+        #sidebar .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #fbbf24;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+        }
+
+        #sidebar nav a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 1rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        #sidebar nav a:hover,
+        #sidebar nav a.active {
+            background: #334155;
+            color: #fbbf24;
+            border-left-color: #fbbf24;
+        }
+
+        #mainContent {
+            margin-left: 250px;
+            padding: 2rem 3rem;
+            min-height: 100vh;
+        }
+
+        header.navbar-top {
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        .btn-sidebar-toggle {
+            background: transparent;
+            border: none;
+            font-size: 1.8rem;
+            color: #1e293b;
+            cursor: pointer;
+            display: none;
+        }
+
+        header.navbar-top button.logout-btn {
+            background: #fbbf24;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+        }
+
+        header.navbar-top button.logout-btn:hover {
+            background: #f59e0b;
+            color: white;
+        }
+
+        @media (max-width: 991.98px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #mainContent {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .btn-sidebar-toggle {
+                display: inline-block;
+            }
+        }
+
+        /* Ocultar todas las secciones por defecto */
+        section.content-section {
+            display: none;
+        }
+
+        /* Mostrar la sección activa */
+        section.content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar" aria-label="Navegación principal">
+        <div class="logo">EPS Universal</div>
+        <nav>
+            <a href="#" class="menu-link active" data-section="admin-panel">Panel Administración</a>
+            <a href="#" class="menu-link" data-section="registrar-doctor">Registrar Doctor</a>
+            <a href="#" class="menu-link" data-section="registrar-paciente">Registrar Paciente</a>
+            <a href="#" class="menu-link" data-section="ver-usuarios">Ver Usuarios</a>
+        </nav>
+    </aside>
+
+    <main id="mainContent">
+        <header class="navbar-top">
+            <button class="btn-sidebar-toggle" id="btnToggleSidebar">&#9776;</button>
+            <h1 class="h5 m-0">Dashboard Administrador</h1>
+            <button class="logout-btn">Cerrar sesión</button>
+        </header>
+
+        <!-- Secciones separadas -->
+        <section id="admin-panel" class="content-section active">
+            <h3>Panel de Administración</h3>
+            <p>Gestiona doctores, pacientes y usuarios del sistema.</p>
+        </section>
+
+        <section id="registrar-doctor" class="content-section">
+            <h3>Registrar Doctor</h3>
+            <form id="formDoctor">
+                <input type="text" class="form-control mb-2" placeholder="Nombre completo" name="nombre" required>
+                <input type="text" class="form-control mb-2" placeholder="Especialidad" name="especialidad" required>
+                <select class="form-control mb-2" name="jornada" required>
+                    <option value="" disabled selected>Jornada</option>
+                    <option value="Matinal">Matinal</option>
+                    <option value="Vespertina">Vespertina</option>
+                </select>
+                <input type="text" class="form-control mb-2" placeholder="Teléfono" name="telefono" required>
+                <input type="email" class="form-control mb-2" placeholder="Correo" name="correo" required>
+                <button type="submit" class="btn btn-primary w-100">Registrar</button>
+            </form>
+        </section>
+
+        <section id="registrar-paciente" class="content-section">
+            <h3>Registrar Paciente</h3>
+            <form id="formPaciente">
+                <input type="text" class="form-control mb-2" placeholder="Nombre completo" name="nombre" required>
+                <input type="number" class="form-control mb-2" placeholder="Número de identificación" name="identificacion" required>
+                <input type="text" class="form-control mb-2" placeholder="Dirección" name="direccion" required>
+                <input type="number" class="form-control mb-2" placeholder="Edad" name="edad" required>
+                <select class="form-control mb-2" name="tipoAfiliacion" required>
+                    <option value="" disabled selected>Tipo de afiliación</option>
+                    <option value="Contributivo">Contributivo</option>
+                    <option value="Subsidiado">Subsidiado</option>
+                </select>
+                <input type="date" class="form-control mb-2" name="fechaIngreso" required>
+                <button type="submit" class="btn btn-primary w-100">Registrar</button>
+            </form>
+        </section>
+
+        <section id="ver-usuarios" class="content-section">
+            <h3>Usuarios Registrados</h3>
+
+            <table class="table table-striped" id="tablaUsuarios">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Email / ID</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usuariosTabla">
+                    <!-- Usuarios cargados desde JS -->
+                </tbody>
+            </table>
+
+            <div id="editarUsuarioSection" style="display:none; margin-top: 2rem;">
+                <h5>Editar Usuario</h5>
+                <form id="formEditarUsuario">
+                    <input type="hidden" name="id" />
+                    <div class="mb-2">
+                        <label>Tipo</label>
+                        <select class="form-control" name="tipo" required>
+                            <option value="doctor">Doctor</option>
+                            <option value="paciente">Paciente</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label>Nombre</label>
+                        <input type="text" class="form-control" name="nombre" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Email / ID</label>
+                        <input type="text" class="form-control" name="emailId" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Estado</label>
+                        <select class="form-control" name="estado" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary ms-2" id="cancelarEdicion">Cancelar</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+    const API_URL = 'http://localhost:3000/api'; // ← Cambia esta URL según tu backend
+
+    // Sidebar toggle
+    document.getElementById('btnToggleSidebar').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // Navegación entre secciones
+    const menuLinks = document.querySelectorAll('.menu-link');
+    const sections = document.querySelectorAll('section.content-section');
+
+    menuLinks.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+
+            menuLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            const sectionToShow = link.dataset.section;
+            sections.forEach(section => {
+                section.classList.toggle('active', section.id === sectionToShow);
+            });
+        });
+    });
+
+    // FORMULARIO DOCTOR
+    document.getElementById('formDoctor').addEventListener('submit', async e => {
+        e.preventDefault();
+        const form = e.target;
+        const doctor = {
+            nombre: form.nombre.value,
+            especialidad: form.especialidad.value,
+            jornada: form.jornada.value,
+            telefono: form.telefono.value,
+            correo: form.correo.value
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/doctores`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(doctor)
+            });
+
+            if (!res.ok) throw new Error('Error al registrar el doctor');
+            alert('Doctor registrado correctamente');
+            form.reset();
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    // FORMULARIO PACIENTE
+    document.getElementById('formPaciente').addEventListener('submit', async e => {
+        e.preventDefault();
+        const form = e.target;
+        const paciente = {
+            nombre: form.nombre.value,
+            identificacion: form.identificacion.value,
+            direccion: form.direccion.value,
+            edad: form.edad.value,
+            tipoAfiliacion: form.tipoAfiliacion.value,
+            fechaIngreso: form.fechaIngreso.value
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/pacientes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paciente)
+            });
+
+            if (!res.ok) throw new Error('Error al registrar el paciente');
+            alert('Paciente registrado correctamente');
+            form.reset();
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    // CARGAR USUARIOS (reemplazar con fetch real)
+    let usuarios = [];
+
+    async function fetchUsuarios() {
+        try {
+            const res = await fetch(`${API_URL}/usuarios`);
+            if (!res.ok) throw new Error('Error al cargar usuarios');
+            usuarios = await res.json();
+            renderUsuarios();
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    const usuariosTabla = document.getElementById('usuariosTabla');
+    const editarUsuarioSection = document.getElementById('editarUsuarioSection');
+    const formEditarUsuario = document.getElementById('formEditarUsuario');
+
+    function renderUsuarios() {
+        usuariosTabla.innerHTML = '';
+        usuarios.forEach(u => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${u.tipo.charAt(0).toUpperCase() + u.tipo.slice(1)}</td>
+                <td>${u.nombre}</td>
+                <td>${u.emailId || u.identificacion}</td>
+                <td>${u.estado === 'activo' ? 
+                    '<span class="badge bg-success">Activo</span>' : 
+                    '<span class="badge bg-secondary">Inactivo</span>'}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary btn-editar" data-id="${u.id}">Editar</button>
+                    <button class="btn btn-sm btn-${u.estado === 'activo' ? 'warning' : 'success'} btn-toggle-estado" data-id="${u.id}">
+                        ${u.estado === 'activo' ? 'Deshabilitar' : 'Habilitar'}
+                    </button>
+                </td>
+            `;
+            usuariosTabla.appendChild(tr);
+        });
+        addBotonesListeners();
+    }
+
+    function addBotonesListeners() {
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                abrirEdicionUsuario(id);
+            });
+        });
+
+        document.querySelectorAll('.btn-toggle-estado').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                toggleEstadoUsuario(id);
+            });
+        });
+    }
+
+    async function abrirEdicionUsuario(id) {
+        const usuario = usuarios.find(u => u.id == id);
+        if (!usuario) return;
+
+        editarUsuarioSection.style.display = 'block';
+
+        formEditarUsuario.id.value = usuario.id;
+        formEditarUsuario.tipo.value = usuario.tipo;
+        formEditarUsuario.nombre.value = usuario.nombre;
+        formEditarUsuario.emailId.value = usuario.emailId || usuario.identificacion;
+        formEditarUsuario.estado.value = usuario.estado;
+
+        editarUsuarioSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    formEditarUsuario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = formEditarUsuario.id.value;
+        const datos = {
+            tipo: formEditarUsuario.tipo.value,
+            nombre: formEditarUsuario.nombre.value,
+            emailId: formEditarUsuario.emailId.value,
+            estado: formEditarUsuario.estado.value
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/usuarios/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            if (!res.ok) throw new Error('Error al editar usuario');
+            alert('Usuario actualizado correctamente');
+            editarUsuarioSection.style.display = 'none';
+            fetchUsuarios();
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    document.getElementById('cancelarEdicion').addEventListener('click', () => {
+        editarUsuarioSection.style.display = 'none';
+    });
+
+    async function toggleEstadoUsuario(id) {
+        try {
+            const res = await fetch(`${API_URL}/usuarios/${id}/estado`, {
+                method: 'PATCH'
+            });
+
+            if (!res.ok) throw new Error('Error al cambiar estado');
+            fetchUsuarios();
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    // Inicializar usuarios al cargar
+    fetchUsuarios();
+</script>
+
+</body>
+
+</html>
