@@ -1,9 +1,10 @@
 <?php
-require_once 'Conexion.php'; // están en el mismo nivel
+include 'Conexion.php';
 
-if (isset($conn) && $conn->ping()) {
-    echo "✅ Conexión exitosa a la base de datos.";
-} else {
-    echo "❌ Error al conectar.";
+try {
+    $conexionObj = new Conexion();
+    $conexion = $conexionObj->conectar();
+    echo "Conexión exitosa";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
 }
-
