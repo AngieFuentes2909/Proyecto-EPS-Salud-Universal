@@ -1,390 +1,390 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <title>Panel de Administrador - EPS Universal</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            background-color: #f4f6fa;
-        }
 
-        .sidebar {
-            width: 250px;
-            background-color: #2F4A9E;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .sidebar-header img {
-            width: 40px;
-            height: 40px;
-        }
-
-        .sidebar h1 {
-            font-size: 18px;
-            margin: 0;
-        }
-
-        .sidebar button {
-            background: none;
-            border: none;
-            color: white;
-            text-align: left;
-            padding: 12px 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-            border-radius: 6px;
-        }
-
-        .sidebar button:hover {
-            background-color: #1f347a;
-        }
-
-        .content {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto;
-            background-color: #fff;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .topbar h2 {
-            color: #2F4A9E;
-            margin: 0;
-            font-weight: 700;
-        }
-
-        .btn-logout {
-            background-color: #2F4A9E;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-        }
-
-        .btn-logout:hover {
-            background-color: #1e306e;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f0f2f5;
-            color: #2F4A9E;
-        }
-
-        tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        button {
-            background-color: #2F4A9E;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #1e306e;
-        }
-
-        input, select {
-            padding: 8px;
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-
-        form {
-            max-width: 500px;
-        }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <img src="https://logodownload.org/wp-content/uploads/2014/10/iurd-logo.png" alt="Logo EPS" />
-            <h1>EPS Universal</h1>
-        </div>
-        <button onclick="mostrarSeccion('unidades')">Unidades Médicas</button>
-        <button onclick="mostrarSeccion('medicos')">Médicos</button>
-        <button onclick="mostrarSeccion('pacientes')">Pacientes</button>
-    </div>
-
-    <div class="content">
-        <div class="topbar">
-            <h2>Panel de Administrador</h2>
-            <button class="btn-logout" onclick="cerrarSesion()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.12 5.7a1 1 0 0 0-1.41 1.42L10.59 12l-4.88 4.88a1 1 0 1 0 1.41 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.41z"/></svg>
-                Cerrar sesión
-            </button>
-        </div>
-
-        <section id="unidades" style="display:none;">
-            <h2>Unidades Médicas</h2>
-            <form id="formUnidad" onsubmit="crearUnidad(event)">
-                <label for="nombreUnidad">Nombre Unidad:</label>
-                <input type="text" id="nombreUnidad" required />
-                
-                <label for="direccionUnidad">Dirección:</label>
-                <input type="text" id="direccionUnidad" required />
-                
-                <button type="submit">Agregar Unidad</button>
-            </form>
-            <table id="tablaUnidades">
-                <thead>
-                    <tr><th>Nombre</th><th>Dirección</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
-
-        <section id="medicos" style="display:none;">
-            <h2>Médicos</h2>
-            <form id="formMedico" onsubmit="crearMedico(event)">
-                <label for="nombreMedico">Nombre:</label>
-                <input type="text" id="nombreMedico" required />
-                
-                <label for="especialidadMedico">Especialidad:</label>
-                <input type="text" id="especialidadMedico" required />
-
-                <label for="unidadMedico">Unidad Médica:</label>
-                <select id="unidadMedico" required></select>
-
-                <button type="submit">Agregar Médico</button>
-            </form>
-            <table id="tablaMedicos">
-                <thead>
-                    <tr><th>Nombre</th><th>Especialidad</th><th>Unidad Médica</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
-
-        <section id="pacientes" style="display:none;">
-            <h2>Pacientes</h2>
-            <form id="formPaciente" onsubmit="crearPaciente(event)">
-                <label for="nombrePaciente">Nombre:</label>
-                <input type="text" id="nombrePaciente" required />
-
-                <label for="direccionPaciente">Dirección:</label>
-                <input type="text" id="direccionPaciente" required />
-
-                <label for="fechaNacimientoPaciente">Fecha de Nacimiento:</label>
-                <input type="date" id="fechaNacimientoPaciente" required />
-
-                <label for="fechaRegistroPaciente">Fecha de Registro:</label>
-                <input type="date" id="fechaRegistroPaciente" required />
-
-                <label for="epsPaciente">EPS:</label>
-                <input type="text" id="epsPaciente" required />
-
-                <label for="tipoPaciente">Tipo (Contributivo/Subsidiado):</label>
-                <select id="tipoPaciente" required>
-                    <option value="">Seleccione</option>
-                    <option value="Contributivo">Contributivo</option>
-                    <option value="Subsidiado">Subsidiado</option>
-                </select>
-
-                <button type="submit">Agregar Paciente</button>
-            </form>
-            <table id="tablaPacientes">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Dirección</th>
-                        <th>Fecha Nac.</th>
-                        <th>Fecha Registro</th>
-                        <th>EPS</th>
-                        <th>Tipo</th>
-                        <th>Contraseña</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </section>
-    </div>
-
-    <script>
-        let unidades = [];
-        let medicos = [];
-        let pacientes = [];
-
-        function mostrarSeccion(id) {
-            document.querySelectorAll('.content section').forEach(sec => sec.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
-
-            if (id === 'medicos') {
-                actualizarSelectUnidades();
-            }
-        }
-
-        function cerrarSesion() {
-            alert('Sesión cerrada');
-            // Aquí iría la lógica real para cerrar sesión
-        }
-
-        // UNIDADES MÉDICAS
-        function crearUnidad(event) {
-            event.preventDefault();
-            const nombre = document.getElementById('nombreUnidad').value.trim();
-            const direccion = document.getElementById('direccionUnidad').value.trim();
-
-            if (unidades.some(u => u.nombre.toLowerCase() === nombre.toLowerCase())) {
-                alert('La unidad médica ya existe.');
-                return;
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Panel Administrador - EPS Universal</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+        <style>
+            body,
+            html {
+                height: 100%;
+                margin: 0;
+                font-family: 'Inter', sans-serif;
+                background: #f1f5f9;
+                color: #1e293b;
+                overflow-x: hidden;
             }
 
-            unidades.push({ nombre, direccion });
-            actualizarTablaUnidades();
-            document.getElementById('formUnidad').reset();
-        }
-
-        function actualizarTablaUnidades() {
-            const tbody = document.querySelector('#tablaUnidades tbody');
-            tbody.innerHTML = '';
-            unidades.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${u.nombre}</td><td>${u.direccion}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // MÉDICOS
-        function actualizarSelectUnidades() {
-            const select = document.getElementById('unidadMedico');
-            select.innerHTML = '<option value="">Seleccione una unidad médica</option>';
-            unidades.forEach(u => {
-                const option = document.createElement('option');
-                option.value = u.nombre;
-                option.textContent = u.nombre;
-                select.appendChild(option);
-            });
-        }
-
-        function crearMedico(event) {
-            event.preventDefault();
-            const nombre = document.getElementById('nombreMedico').value.trim();
-            const especialidad = document.getElementById('especialidadMedico').value.trim();
-            const unidad = document.getElementById('unidadMedico').value;
-
-            if (!unidad) {
-                alert('Por favor seleccione una unidad médica.');
-                return;
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 250px;
+                background: #2d3748;
+                display: flex;
+                flex-direction: column;
+                padding-top: 1.5rem;
+                z-index: 1100;
             }
 
-            // Verificar si la unidad ya está asignada a otro médico
-            if (medicos.some(m => m.unidad === unidad)) {
-                alert('La unidad médica ya está ocupada por otro médico.');
-                return;
+            #sidebar .logo {
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: #facc15;
+                text-align: center;
+                margin-bottom: 2rem;
             }
 
-            medicos.push({ nombre, especialidad, unidad });
-            actualizarTablaMedicos();
-            document.getElementById('formMedico').reset();
-        }
-
-        function actualizarTablaMedicos() {
-            const tbody = document.querySelector('#tablaMedicos tbody');
-            tbody.innerHTML = '';
-            medicos.forEach(m => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${m.nombre}</td><td>${m.especialidad}</td><td>${m.unidad}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // PACIENTES
-        function crearPaciente(event) {
-            event.preventDefault();
-
-            const nombre = document.getElementById('nombrePaciente').value.trim();
-            const direccion = document.getElementById('direccionPaciente').value.trim();
-            const fechaNacimiento = document.getElementById('fechaNacimientoPaciente').value;
-            const fechaRegistro = document.getElementById('fechaRegistroPaciente').value;
-            const eps = document.getElementById('epsPaciente').value.trim();
-            const tipo = document.getElementById('tipoPaciente').value;
-
-            // Generar contraseña aleatoria de 8 caracteres
-            const password = generarContrasena(8);
-
-            pacientes.push({ nombre, direccion, fechaNacimiento, fechaRegistro, eps, tipo, password });
-            actualizarTablaPacientes();
-            document.getElementById('formPaciente').reset();
-        }
-
-        function generarContrasena(length) {
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let pass = '';
-            for (let i = 0; i < length; i++) {
-                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            #sidebar nav a {
+                display: block;
+                padding: 1rem 1.5rem;
+                color: #e2e8f0;
+                font-weight: 600;
+                text-decoration: none;
+                border-left: 4px solid transparent;
+                transition: all 0.3s ease;
             }
-            return pass;
-        }
 
-        function actualizarTablaPacientes() {
-            const tbody = document.querySelector('#tablaPacientes tbody');
-            tbody.innerHTML = '';
-            pacientes.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${p.nombre}</td>
-                    <td>${p.direccion}</td>
-                    <td>${p.fechaNacimiento}</td>
-                    <td>${p.fechaRegistro}</td>
-                    <td>${p.eps}</td>
-                    <td>${p.tipo}</td>
-                    <td>${p.password}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+            #sidebar nav a:hover,
+            #sidebar nav a.active {
+                background: #4a5568;
+                color: #facc15;
+                border-left: 4px solid #facc15;
+            }
 
-        // Mostrar sección por defecto
-        mostrarSeccion('unidades');
-    </script>
-</body>
+            #mainContent {
+                margin-left: 250px;
+                padding: 2rem 3rem;
+            }
+
+            header.navbar-top {
+                height: 60px;
+                background: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 2rem;
+                margin-bottom: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            }
+
+            .dropdown-toggle::after {
+                display: none;
+            }
+
+            .dropdown-menu {
+                background-color: #ffffff;
+                border: 1px solid #e5e7eb;
+            }
+
+            .dropdown-item {
+                color: #1e293b;
+            }
+
+            .dropdown-item:hover {
+                background-color: #facc15;
+                color: #1e293b;
+            }
+
+            h2 {
+                margin-bottom: 1.5rem;
+                font-weight: 700;
+            }
+
+            .card {
+                background: #ffffff;
+                padding: 2rem;
+                border-radius: 12px;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+                margin-bottom: 2rem;
+            }
+
+            .form-label {
+                font-weight: 600;
+            }
+
+            .form-control,
+            .form-select {
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .btn-custom {
+                background-color: #facc15;
+                color: #1e293b;
+                font-weight: 600;
+                border: none;
+            }
+
+            .btn-custom:hover {
+                background-color: #eab308;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="logo">EPS Universal</div>
+            <nav>
+                <a href="#unidades" class="active" onclick="mostrarSeccion('unidades')">Unidades Médicas</a>
+                <a href="#doctores" onclick="mostrarSeccion('doctores')">Doctores</a>
+                <a href="#pacientes" onclick="mostrarSeccion('pacientes')">Pacientes</a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main id="mainContent">
+            <header class="navbar-top">
+                <h1 style="font-weight: 700; font-size: 1.5rem;">Panel de Administración</h1>
+                <!-- Dropdown con ícono de usuario -->
+                <div class="dropdown">
+                    <button class="btn text-dark dropdown-toggle" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
+                        <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </header>
+
+
+            <!-- RF1 - Unidades Médicas -->
+            <section id="unidades">
+                <h2>📋 Gestión de Unidades Médicas</h2>
+                <div class="card p-3">
+                    <form id="formUnidades">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de la unidad</label>
+                            <input type="text" name="nombre" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ubicacion</label>
+                            <input type="text" name="sitio" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Planta</label>
+                            <input type="text" name="planta" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Doctor Responsable</label>
+                            <select id="doctorSelect" name="doctor" class="form-select" required>
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-custom">Registrar Unidad</button>
+                    </form>
+
+                </div>
+            </section>
+            <div id="mensajeUnidad" style="margin-top:10px;"></div>
+
+
+
+            <!-- RF2 - Doctores -->
+            <section id="doctores" style="display:none">
+                <h2>🧑‍⚕ Gestión de Doctores</h2>
+                <div class="card p-3">
+                    <form id="formDoctores">
+                        <div class="mb-3">
+                            <label class="form-label">Identificación</label>
+                            <input type="text" name="identificacion" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Apellido</label>
+                            <input type="text" name="apellido" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" name="telefono" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" name="direccion" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Especialidad</label>
+                            <input type="text" name="especialidad" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Jornada Laboral</label>
+                            <select name="jornada" class="form-select">
+                                <option value="">Seleccione una jornada </option>
+                                <option value="matinal">Matinal</option>
+                                <option value="vespertina">Vespertina</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de Usuario</label>
+                            <input type="text" name="nombreUsuario" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña generada</label>
+                            <input type="text" class="form-control" id="passDoc" readonly>
+                            <button type="button" onclick="generarPassword('passDoc')" class="btn btn-outline-warning mt-2">Generar contraseña</button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Unidad (opcional)</label>
+                            <select name="unidad_id" class="form-select">
+                                <option value="">-- Sin asignar --</option>
+                                <!-- Opciones cargadas dinámicamente -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-custom">Registrar Doctor</button>
+                    </form>
+                </div>
+                <div id="mensajeDoctor" style="margin-top:10px;"></div>
+            </section>
+
+
+            <!-- RF3 - Pacientes -->
+            <section id="pacientes" style="display:none">
+                <h2>🧑‍💼 Gestión de Pacientes</h2>
+                <div class="card">
+                    <form>
+                        <label class="form-label">Identificación</label>
+                        <input type="text" class="form-control" required>
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" required>
+                        <label class="form-label">Apellido</label>
+                        <input type="text" class="form-control" required>
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control">
+                        <label class="form-label">Edad</label>
+                        <input type="number" class="form-control">
+                        <label class="form-label">Tipo de afiliación</label>
+                        <select class="form-select">
+                            <option>Contributivo</option>
+                            <option>Subsidiado</option>
+                        </select>
+                        <label class="form-label">Fecha de ingreso</label>
+                        <input type="date" class="form-control">
+                        <label class="form-label">Contraseña generada</label>
+                        <input type="text" class="form-control" id="passPac" readonly>
+                        <div class="d-flex gap-2">
+                            <button type="button" onclick="generarPassword('passPac')" class="btn btn-outline-warning">Generar contraseña</button>
+                            <button type="submit" class="btn btn-custom">Registrar Paciente</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+                                // Función para mostrar secciones del panel
+                                function mostrarSeccion(id) {
+                                    ['unidades', 'doctores', 'pacientes'].forEach(sec => {
+                                        const seccion = document.getElementById(sec);
+                                        if (seccion)
+                                            seccion.style.display = (sec === id) ? 'block' : 'none';
+                                    });
+
+                                    const links = document.querySelectorAll('#sidebar nav a');
+                                    links.forEach(link => link.classList.remove('active'));
+
+                                    const linkActivo = document.querySelector(`#sidebar nav a[href="#${id}"]`);
+                                    if (linkActivo)
+                                        linkActivo.classList.add('active');
+                                }
+
+                                // Función para generar contraseñas aleatorias
+                                function generarPassword(idInput) {
+                                    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$!";
+                                    let pass = "";
+                                    for (let i = 0; i < 10; i++) {
+                                        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+                                    }
+                                    document.getElementById(idInput).value = pass;
+                                }
+
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    // Cargar doctores en el select
+                                    fetch('../controller/obtenerdatos.php?tipo=doctores')
+                                            .then(response => {
+                                                if (!response.ok)
+                                                    throw new Error('No se pudo cargar los doctores');
+                                                return response.json();
+                                            })
+                                            .then(data => {
+                                                const select = document.getElementById('doctorSelect');
+                                                data.forEach(doctor => {
+                                                    const option = document.createElement('option');
+                                                    option.value = doctor.id;
+                                                    option.textContent = doctor.nombre + ' ' + doctor.apellido;
+                                                    select.appendChild(option);
+                                                });
+                                            })
+                                            .catch(error => {
+                                                console.error('Error al obtener doctores:', error);
+                                            });
+
+                                    // Escuchar submit del formulario de unidades
+                                    document.getElementById('formUnidades').addEventListener('submit', function (e) {
+                                        e.preventDefault();
+
+                                        const formData = new FormData(this);
+                                        const datos = Object.fromEntries(formData.entries());
+
+                                        if (!datos.doctor) {
+                                            mostrarMensaje('Por favor selecciona un doctor responsable.', false);
+                                            return;
+                                        }
+
+                                        fetch('../controller/unidadcontroller.php', {
+                                            method: 'POST',
+                                            headers: {'Content-Type': 'application/json'},
+                                            body: JSON.stringify({
+                                                nombre: datos.nombre,
+                                                sitio: datos.sitio,
+                                                planta: datos.planta,
+                                                doctor: datos.doctor
+                                            })
+                                        })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    mostrarMensaje(data.mensaje, data.exito);
+                                                    if (data.exito)
+                                                        this.reset();
+                                                })
+                                                .catch(err => {
+                                                    mostrarMensaje('Error en la petición: ' + err.message, false);
+                                                });
+                                    });
+                                });
+
+                                // Función para mostrar mensajes en pantalla
+                                function mostrarMensaje(mensaje, exito) {
+                                    let div = document.getElementById('mensajeUnidad');
+                                    if (!div) {
+                                        div = document.createElement('div');
+                                        div.id = 'mensajeUnidad';
+                                        div.style.marginTop = '10px';
+                                        document.querySelector('#formUnidades').after(div);
+                                    }
+                                    div.textContent = mensaje;
+                                    div.style.color = exito ? 'green' : 'red';
+                                }
+        </script>
+
+
+    </body>
+
 </html>
+
