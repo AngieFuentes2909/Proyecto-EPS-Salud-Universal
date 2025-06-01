@@ -198,12 +198,7 @@
             </form>
             <table id="tablaMedicos">
                 <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Especialidad</th>
-                        <th>Unidad Médica</th>
-                        <th>Acciones</th>
-                    </tr>
+                    <tr><th>Nombre</th><th>Especialidad</th><th>Unidad Médica</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
@@ -234,9 +229,6 @@
                     <option value="Subsidiado">Subsidiado</option>
                 </select>
 
-                <label for="generarContrasena">Generar contraseña automáticamente:</label>
-                <input type="checkbox" id="generarContrasena" name="generarContrasena" checked />
-
                 <button type="submit">Agregar Paciente</button>
             </form>
             <table id="tablaPacientes">
@@ -249,7 +241,6 @@
                         <th>EPS</th>
                         <th>Tipo</th>
                         <th>Contraseña</th>
-                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -298,18 +289,15 @@
             unidades.forEach(u => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td>${u.nombre}</td><td>${u.direccion}</td>`;
-
                 tbody.appendChild(tr);
             });
         }
 
         // MÉDICOS
-        function actualizarSelectUnidades(editMode = false, currentUnidad = '') {
+        function actualizarSelectUnidades() {
             const select = document.getElementById('unidadMedico');
             select.innerHTML = '<option value="">Seleccione una unidad médica</option>';
-            const unidadesAsignadas = medicos.map(m => m.unidad);
-            const unidadesDisponibles = unidades.filter(u => !unidadesAsignadas.includes(u.nombre) || u.nombre === currentUnidad);
-            unidadesDisponibles.forEach(u => {
+            unidades.forEach(u => {
                 const option = document.createElement('option');
                 option.value = u.nombre;
                 option.textContent = u.nombre;
@@ -328,6 +316,7 @@
                 return;
             }
 
+            // Verificar si la unidad ya está asignada a otro médico
             if (medicos.some(m => m.unidad === unidad)) {
                 alert('La unidad médica ya está ocupada por otro médico.');
                 return;
@@ -338,58 +327,12 @@
             document.getElementById('formMedico').reset();
         }
 
-        function eliminarMedico(index) {
-            if (confirm('¿Está seguro de que desea eliminar este médico?')) {
-                medicos.splice(index, 1);
-                actualizarTablaMedicos();
-            }
-        }
-
-        function editarMedico(index) {
-            const medico = medicos[index];
-            document.getElementById('nombreMedico').value = medico.nombre;
-            document.getElementById('especialidadMedico').value = medico.especialidad;
-            actualizarSelectUnidades(true, medico.unidad);
-            document.getElementById('unidadMedico').value = medico.unidad;
-
-            const form = document.getElementById('formMedico');
-            form.onsubmit = function(event) {
-                event.preventDefault();
-                const nombre = document.getElementById('nombreMedico').value.trim();
-                const especialidad = document.getElementById('especialidadMedico').value.trim();
-                const unidad = document.getElementById('unidadMedico').value;
-
-                if (!unidad) {
-                    alert('Por favor seleccione una unidad médica.');
-                    return;
-                }
-
-                if (unidad !== medico.unidad && medicos.some(m => m.unidad === unidad)) {
-                    alert('La unidad médica ya está ocupada por otro médico.');
-                    return;
-                }
-
-                medicos[index] = { nombre, especialidad, unidad };
-                actualizarTablaMedicos();
-                document.getElementById('formMedico').reset();
-                form.onsubmit = crearMedico;
-            };
-        }
-
         function actualizarTablaMedicos() {
             const tbody = document.querySelector('#tablaMedicos tbody');
             tbody.innerHTML = '';
-            medicos.forEach((m, index) => {
+            medicos.forEach(m => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${m.nombre}</td>
-                    <td>${m.especialidad}</td>
-                    <td>${m.unidad}</td>
-                    <td>
-                        <button onclick="editarMedico(${index})">Editar</button>
-                        <button onclick="eliminarMedico(${index})">Eliminar</button>
-                    </td>
-                `;
+                tr.innerHTML = `<td>${m.nombre}</td><td>${m.especialidad}</td><td>${m.unidad}</td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -397,23 +340,16 @@
         // PACIENTES
         function crearPaciente(event) {
             event.preventDefault();
+
             const nombre = document.getElementById('nombrePaciente').value.trim();
             const direccion = document.getElementById('direccionPaciente').value.trim();
             const fechaNacimiento = document.getElementById('fechaNacimientoPaciente').value;
             const fechaRegistro = document.getElementById('fechaRegistroPaciente').value;
             const eps = document.getElementById('epsPaciente').value.trim();
             const tipo = document.getElementById('tipoPaciente').value;
-            const generarContrasena = document.getElementById('generarContrasena').checked;
 
-            let password = '';
-            if (generarContrasena) {
-                password = generarContrasena(8);
-                alert(`Paciente registrado. Contraseña generada: ${password}`);
-
-            } else {
-                // Si no se genera automáticamente, se podría dejar vacío o añadir un campo manual
-                password = generarContrasena(8); // Por ahora, generamos una por defecto si no se selecciona
-            }
+            // Generar contraseña aleatoria de 8 caracteres
+            const password = generarContrasena(8);
 
             pacientes.push({ nombre, direccion, fechaNacimiento, fechaRegistro, eps, tipo, password });
             actualizarTablaPacientes();
@@ -429,52 +365,10 @@
             return pass;
         }
 
-        function eliminarPaciente(index) {
-            if (confirm('¿Está seguro de que desea eliminar este paciente?')) {
-                pacientes.splice(index, 1);
-                actualizarTablaPacientes();
-            }
-        }
-
-        function editarPaciente(index) {
-            const paciente = pacientes[index];
-            document.getElementById('nombrePaciente').value = paciente.nombre;
-            document.getElementById('direccionPaciente').value = paciente.direccion;
-            document.getElementById('fechaNacimientoPaciente').value = paciente.fechaNacimiento;
-            document.getElementById('fechaRegistroPaciente').value = paciente.fechaRegistro;
-            document.getElementById('epsPaciente').value = paciente.eps;
-            document.getElementById('tipoPaciente').value = paciente.tipo;
-            document.getElementById('generarContrasena').checked = false; // No forzamos generación al editar
-
-            const form = document.getElementById('formPaciente');
-            form.onsubmit = function(event) {
-                event.preventDefault();
-                const nombre = document.getElementById('nombrePaciente').value.trim();
-                const direccion = document.getElementById('direccionPaciente').value.trim();
-                const fechaNacimiento = document.getElementById('fechaNacimientoPaciente').value;
-                const fechaRegistro = document.getElementById('fechaRegistroPaciente').value;
-                const eps = document.getElementById('epsPaciente').value.trim();
-                const tipo = document.getElementById('tipoPaciente').value;
-                const generarContrasena = document.getElementById('generarContrasena').checked;
-
-                let password = paciente.password; // Mantener la contraseña existente
-                if (generarContrasena) {
-                    password = generarContrasena(8);
-                    alert(`Contraseña actualizada. Nueva contraseña: ${password}`);
-
-                }
-
-                pacientes[index] = { nombre, direccion, fechaNacimiento, fechaRegistro, eps, tipo, password };
-                actualizarTablaPacientes();
-                document.getElementById('formPaciente').reset();
-                form.onsubmit = crearPaciente;
-            };
-        }
-
         function actualizarTablaPacientes() {
             const tbody = document.querySelector('#tablaPacientes tbody');
             tbody.innerHTML = '';
-            pacientes.forEach((p, index) => {
+            pacientes.forEach(p => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${p.nombre}</td>
@@ -484,10 +378,6 @@
                     <td>${p.eps}</td>
                     <td>${p.tipo}</td>
                     <td>${p.password}</td>
-                    <td>
-                        <button onclick="editarPaciente(${index})">Editar</button>
-                        <button onclick="eliminarPaciente(${index})">Eliminar</button>
-                    </td>
                 `;
                 tbody.appendChild(tr);
             });
